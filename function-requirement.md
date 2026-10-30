@@ -2,10 +2,10 @@
 ## ĐỒ ÁN MÔN HỌC: CÔNG NGHỆ PHẦN MỀM
 ### HỆ THỐNG ĐIỂM DANH SINH VIÊN BẰNG ĐỊNH VỊ GPS (SMART GPS ATTENDANCE SYSTEM)
 
-* **Tên đề tài:** Hệ thống điểm danh sinh viên thông minh dựa trên định vị GPS và Hàng rào địa lý (Geofencing)
+* **Tên đề tài:** Hệ thống điểm danh sinh viên thông minh dựa trên định vị GPS 
 * **Phiên bản:** 1.0 (Official Draft)
 * **Ngày lập:** 31/10/2026
-* **Đơn vị thực hiện:** Nhóm sinh viên thực hiện đồ án môn Công nghệ phần mềm
+* **Đơn vị thực hiện:** Group_01
 
 ---
 
@@ -32,14 +32,14 @@
 
 ---
 
-## 1. YÊU CẦU CHỨC NĂNG (MÔ TẢ BẰNG NGÔN NGỮ TỰ NHIÊN)
+## I. YÊU CẦU CHỨC NĂNG (MÔ TẢ BẰNG NGÔN NGỮ TỰ NHIÊN)
 
-### 1.1. Bối cảnh và mục tiêu của hệ thống
+### 1. Bối cảnh và mục tiêu của hệ thống
 Hệ thống ra đời nhằm tự động hóa quy trình điểm danh truyền thống, tiết kiệm thời gian giảng dạy và giải quyết triệt để vấn đề gian lận điểm danh hộ. Kế thừa cấu trúc giao diện quen thuộc từ hệ thống LMS hiện tại của nhà trường (các bảng theo dõi môn học `All courses`, chi tiết từng ca `This course`, tỷ lệ chuyên cần `%`, điểm số buổi học `Points: 10/10` và trạng thái `Remarks: Self-recorded`), hệ thống tích hợp công nghệ **Định vị GPS** và **Hàng rào địa lý (Geofencing)** để xác thực sự hiện diện thực tế của sinh viên trong giảng đường, đồng thời phân loại kết quả điểm danh dựa trên mốc thời gian có mặt.
 
 ---
 
-### 1.2. Quy tắc nghiệp vụ về thời gian và vị trí điểm danh (Business Rules)
+### 2. Quy tắc nghiệp vụ về thời gian và vị trí điểm danh (Business Rules)
 Mỗi ca học có giờ bắt đầu chính thức là $T_{start}$ (Ví dụ: 07:00 AM). Quy trình phân loại điểm danh được hệ thống tự động đánh giá như sau:
 
 | Khung thời gian bấm điểm danh ($T_{checkin}$) | Điều kiện vị trí ($d$) | Trạng thái ghi nhận (`Status`) | Điểm số buổi học (`Points`) | Ghi chú trên hệ thống (`Remarks`) |
@@ -51,9 +51,9 @@ Mỗi ca học có giờ bắt đầu chính thức là $T_{start}$ (Ví dụ: 0
 
 ---
 
-### 1.3. Mô tả chi tiết chức năng theo phân hệ
+### 3. Mô tả chi tiết chức năng theo phân hệ
 
-#### A. Phân hệ Sinh viên
+#### 3.1. Phân hệ Sinh viên
 1. **Đăng nhập và quản lý thiết bị sử dụng:**
    * Sinh viên đăng nhập vào hệ thống bằng tài khoản và mật khẩu do nhà trường cấp.
    * Nhằm ngăn chặn triệt để tình trạng một sinh viên cầm nhiều điện thoại điểm danh hộ cho bạn, mỗi tài khoản sinh viên chỉ được phép liên kết và điểm danh trên **một thiết bị di động duy nhất** trong suốt ca học đó.
@@ -76,7 +76,7 @@ Mỗi ca học có giờ bắt đầu chính thức là $T_{start}$ (Ví dụ: 0
 5. **Gửi khiếu nại điểm danh:**
    * Trong trường hợp thiết bị gặp lỗi phần cứng GPS, mạng chập chờn, hoặc sinh viên có giấy phép nghỉ học hợp lệ, sinh viên có thể tạo đơn giải trình trực tiếp trên hệ thống kèm hình ảnh minh chứng để giảng viên xem xét duyệt bù.
 
-#### B. Phân hệ Giảng viên
+#### 3.2. Phân hệ Giảng viên
 1. **Thiết lập và mở phiên điểm danh GPS cho ca học:**
    * Giảng viên truy cập vào lớp học phần trên lịch giảng dạy và bấm **[Mở phiên điểm danh GPS]**.
    * Hệ thống tự động điền thông tin phòng học và tọa độ kinh độ/vĩ độ chuẩn của phòng học đó theo thời khóa biểu.
@@ -91,7 +91,7 @@ Mỗi ca học có giờ bắt đầu chính thức là $T_{start}$ (Ví dụ: 0
    * Giảng viên xem báo cáo tỷ lệ chuyên cần của toàn lớp, lọc danh sách sinh viên vắng quá 20% số buổi để nhắc nhở hoặc cấm thi.
    * Hỗ trợ xuất toàn bộ bảng điểm danh của lớp ra file Excel hoặc PDF để nộp về khoa hoặc phòng đào tạo.
 
-#### C. Phân hệ Quản trị viên (Admin)
+#### 3.3. Phân hệ Quản trị viên (Admin)
 1. **Quản lý danh mục phòng học và tọa độ GPS chuẩn:**
    * Quản trị viên cập nhật danh sách các cơ sở, tòa nhà và từng phòng học của trường.
    * Nhập chính xác tọa độ vĩ độ và kinh độ của từng phòng học cùng bán kính chuẩn.
