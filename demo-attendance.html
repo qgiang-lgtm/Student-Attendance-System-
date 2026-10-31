@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ thống Điểm danh Sinh viên bằng GPS - Web Application</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --accent: #3b82f6;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    body {
+      background-color: var(--bg);
+      color: #f1f5f9;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="p-3 md:p-6 min-h-screen flex flex-col justify-center">
+
+  <!-- ============================================================= -->
+  <!-- 1. MÀN HÌNH ĐĂNG NHẬP (LOGIN PAGE)                            -->
+  <!-- ============================================================= -->
+  <div id="login-container" class="max-w-md w-full mx-auto space-y-6 my-auto">
+    
+    <!-- Logo & Header trường -->
+    <div class="text-center space-y-2">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 p-0.5 shadow-xl shadow-blue-500/20 flex items-center justify-center">
+        <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-blue-400">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="text-xs font-bold text-blue-400 uppercase tracking-widest">Cổng Thông Tin Đào Tạo & Điểm Danh</div>
+      <h1 class="text-2xl font-extrabold text-white tracking-tight">Đăng Nhập Hệ Thống</h1>
+      <p class="text-xs text-slate-400">Sử dụng tài khoản trường cấp để truy cập vào hệ thống điểm danh GPS</p>
+    </div>
+
+    <!-- Login Box Card -->
+    <div class="bg-[#18202F] border border-slate-700/80 rounded-3xl p-6 md:p-8 shadow-2xl space-y-5">
+      
+      <!-- Role selector tabs -->
+      <div class="grid grid-cols-2 gap-2 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
+        <button type="button" onclick="selectLoginRole('student')" id="role-btn-student" class="py-2 text-xs font-bold rounded-xl transition bg-blue-600 text-white shadow">
+          🎓 Sinh viên
+        </button>
+        <button type="button" onclick="selectLoginRole('lecturer')" id="role-btn-lecturer" class="py-2 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white">
+          👨‍🏫 Giảng viên
+        </button>
+      </div>
+
+      <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <!-- Input Username -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold text-slate-300" id="label-username">Mã số sinh viên (MSSV)</label>
+          <div class="relative">
+            <input type="text" id="input-username" value="B22DCCN001" required
+              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition font-mono">
+            <span class="absolute right-3.5 top-3.5 text-slate-500 text-xs">👤</span>
+          </div>
+        </div>
+
+        <!-- Input Password -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-semibold text-slate-300">Mật khẩu</label>
+            <a href="javascript:void(0)" onclick="alert('Vui lòng liên hệ Phòng Đào tạo hoặc dùng chức năng khôi phục mật khẩu qua Email sinh viên.')" class="text-[12px] text-blue-400 hover:underline">Quên mật khẩu?</a>
+          </div>
+          <div class="relative">
+            <input type="password" id="input-password" value="********" required
+              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition font-mono">
+            <span class="absolute right-3.5 top-3.5 text-slate-500 text-xs">🔒</span>
+          </div>
+        </div>
+
+        <!-- Anti-proxy notification badge -->
+        <div class="p-3 bg-blue-950/40 border border-blue-500/30 rounded-xl text-[12px] text-blue-300 flex items-start gap-2">
+          <span class="text-sm">🛡️</span>
+          <span>Thiết bị đăng nhập sẽ được gắn với mã phần cứng (Device ID: <strong>DEV-IPH14-8841</strong>) để chống điểm danh hộ.</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-login" class="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl transition shadow-lg shadow-blue-500/25 active:scale-95 flex items-center justify-center gap-2">
+          <span>Đăng nhập vào hệ thống</span>
+          <span>&rarr;</span>
+        </button>
+      </form>
+
+      <!-- Quick Login Demo Shortcuts -->
+      <div class="pt-3 border-t border-slate-800 text-center space-y-2">
+        <div class="text-[12px] text-slate-400">Chọn tài khoản mẫu để vào nhanh:</div>
+        <div class="flex flex-wrap gap-2 justify-center text-xs">
+          <button type="button" onclick="quickFill('B22DCCN001', 'student')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-blue-300 border border-slate-700 font-medium">
+            Sinh viên (B22DCCN001)
+          </button>
+          <button type="button" onclick="quickFill('GV_CNPM_01', 'lecturer')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-medium">
+            Giảng viên (ThS. Nguyễn Văn A)
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Copyright -->
+    <div class="text-center text-[12px] text-slate-500">
+      Đồ án môn Công nghệ phần mềm • Group_01 • © 2026 Smart Attendance System
+    </div>
+  </div>
+
+
+  <!-- ============================================================= -->
+  <!-- 2. GIAO DIỆN CHÍNH SAU KHI ĐĂNG NHẬP (DASHBOARD)              -->
+  <!-- ============================================================= -->
+  <div id="main-app" class="hidden max-w-6xl mx-auto w-full space-y-6">
+
+    <!-- Header bar mô phỏng hệ thống trường -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-[#18202F] border border-slate-700/60 rounded-2xl shadow-xl">
+      <div class="flex items-center space-x-3">
+        <div class="w-11 h-11 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-xs font-semibold tracking-wider text-blue-400 uppercase">Hệ Thống Điểm Danh Sinh Viên GPS</div>
+          <h1 class="text-xl font-bold text-white tracking-tight">Smart Attendance Portal</h1>
+        </div>
+      </div>
+
+      <!-- Sinh viên / Giảng viên info badge + Nút Đăng xuất -->
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-3 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
+          <div id="header-avatar" class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-xs text-white">
+            SV
+          </div>
+          <div class="text-left text-xs">
+            <div id="header-user-name" class="font-semibold text-slate-200">Trần Đức Khang (B22DCCN001)</div>
+            <div id="header-user-role" class="text-slate-400">Lớp: D22CQCN01-N | Sinh viên</div>
+          </div>
+        </div>
+
+        <!-- Nút Đăng xuất -->
+        <button onclick="handleLogout()" title="Đăng xuất khỏi hệ thống" class="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition flex items-center gap-1.5 text-xs font-bold">
+          <span>🚪</span>
+          <span class="hidden sm:inline">Đăng xuất</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============================================================= -->
+    <!-- BẢNG ĐIỀU KHIỂN: LỊCH HỌC & CA ĐIỂM DANH HÔM NAY (MỚI BỔ SUNG) -->
+    <!-- Giúp sinh viên biết chính xác hôm nay học môn gì để điểm danh -->
+    <!-- ============================================================= -->
+    <div id="today-schedule-banner" class="bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-slate-900 border border-blue-500/40 rounded-2xl p-5 shadow-xl space-y-3">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-blue-500/20 pb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="flex h-3 w-3 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </span>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            📅 Lịch Học & Ca Điểm Danh Hôm Nay (Thứ Ba, 31/10/2026)
+          </h2>
+        </div>
+        <div class="text-xs text-blue-300 font-mono bg-blue-950/60 px-3 py-1 rounded-full border border-blue-500/30">
+          Thời gian hệ thống: <strong id="banner-clock">07:06:15 AM</strong>
+        </div>
+      </div>
+
+      <!-- Grid các môn học hôm nay -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Ca 1: MÔN ĐANG MỞ ĐIỂM DANH NGAY LÚC NÀY -->
+        <div class="bg-[#151D2A] border-2 border-emerald-500/50 rounded-xl p-4 shadow-lg space-y-3 relative overflow-hidden">
+          <div class="absolute -right-8 -top-8 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl"></div>
+          
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse">
+                🟢 ĐANG MỞ ĐIỂM DANH GPS
+              </span>
+              <h3 class="text-sm font-bold text-white mt-1.5">[HKI2627] - Công nghệ phần mềm</h3>
+              <p class="text-xs text-slate-300">Phòng: <strong class="text-blue-400 font-mono">B204</strong> (Giảng đường B) • Ca 1 (07:00 - 09:20)</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[11px] text-amber-300 font-semibold block">Khung tính đúng giờ:</span>
+              <span class="text-xs font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">Còn 3p 45s</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <div class="text-[12px] text-slate-400">
+              Giảng viên: <strong>ThS. Nguyễn Văn A</strong>
+            </div>
+            <!-- NÚT 1 CHẠM ĐỂ ĐIỂM DANH NGAY MÔN HÔM NAY -->
+            <button onclick="goToCourseCheckIn('[HKI2627] - Công nghệ phần mềm', 'B204')" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl transition shadow-lg shadow-emerald-600/30 active:scale-95 flex items-center gap-1.5">
+              <span>📍</span>
+              <span>ĐIỂM DANH GPS NGAY</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ca 2: MÔN HỌC TIẾP THEO TRONG NGÀY (CHƯA TỚI GIỜ) -->
+        <div class="bg-[#151D2A] border border-slate-700/80 rounded-xl p-4 space-y-3 opacity-80 hover:opacity-100 transition">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                🕒 Ca tiếp theo (09:30 - 11:50)
+              </span>
+              <h3 class="text-sm font-bold text-slate-200 mt-1.5">[012012300212] - Mạng máy tính</h3>
+              <p class="text-xs text-slate-400">Phòng: <strong class="text-slate-300 font-mono">A301</strong> (Tòa A) • GV: TS. Lê Quang</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[11px] text-slate-400 block">Thời gian mở:</span>
+              <span class="text-xs font-mono text-slate-300">09:25 AM</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <div class="text-[12px] text-slate-500">
+              Phiên chưa kích hoạt
+            </div>
+            <button disabled class="px-3.5 py-1.5 bg-slate-800 text-slate-500 font-semibold text-xs rounded-xl cursor-not-allowed border border-slate-700">
+              Chờ mở phiên
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Navigation Tabs (Chuẩn LMS trường) -->
+    <div class="flex flex-wrap gap-2 border-b border-slate-700/80 pb-3">
+      <button onclick="switchTab('all-courses')" id="tab-all-courses" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 bg-blue-600 text-white shadow-lg shadow-blue-500/20">
+        <span>📚</span> Tất cả môn học (All courses)
+      </button>
+      <button onclick="switchTab('this-course')" id="tab-this-course" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700">
+        <span>📋</span> Chi tiết môn học (This course)
+      </button>
+      <button onclick="switchTab('checkin-gps')" id="tab-checkin-gps" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700">
+        <span>📍</span> Sinh viên Check-in GPS (Mobile View)
+      </button>
+      <button onclick="switchTab('lecturer-radar')" id="tab-lecturer-radar" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700">
+        <span>👨‍🏫</span> Giảng viên: Radar Phòng B204 (Live)
+      </button>
+    </div>
+
+    <!-- TAB 1: ALL COURSES (Mô phỏng ảnh chụp số 4 của trường) -->
+    <div id="view-all-courses" class="tab-content space-y-4">
+      <div class="bg-[#18202F] border border-slate-700/60 rounded-2xl p-5 shadow-lg overflow-x-auto custom-scrollbar">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-white">Tổng hợp chuyên cần học kỳ</h2>
+            <p class="text-xs text-slate-400">Danh sách môn học được đồng bộ từ cổng đào tạo</p>
+          </div>
+          <span class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold rounded-full">
+            Tỷ lệ trung bình: 97.5%
+          </span>
+        </div>
+
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="text-xs uppercase bg-slate-800/80 text-slate-400 border-b border-slate-700">
+            <tr>
+              <th class="py-3 px-4">Môn học (Course)</th>
+              <th class="py-3 px-4">Hình thức</th>
+              <th class="py-3 px-4 text-center">Số ca (Taken)</th>
+              <th class="py-3 px-4 text-center">Điểm (Points)</th>
+              <th class="py-3 px-4 text-center">Tỷ lệ % (Percentage)</th>
+              <th class="py-3 px-4 text-right">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800">
+            <tr class="hover:bg-slate-800/50 transition">
+              <td class="py-3 px-4 font-medium text-white">[012012200319] - Lập trình hướng đối tượng - 7480201369369</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-xs rounded">GPS Auto</span></td>
+              <td class="py-3 px-4 text-center">7</td>
+              <td class="py-3 px-4 text-center font-semibold text-emerald-400">14 / 14</td>
+              <td class="py-3 px-4 text-center font-bold text-emerald-400">100.0%</td>
+              <td class="py-3 px-4 text-right"><button onclick="switchTab('this-course')" class="text-xs text-blue-400 hover:underline">Chi tiết &rarr;</button></td>
+            </tr>
+            <tr class="hover:bg-slate-800/50 transition">
+              <td class="py-3 px-4 font-medium text-white">[012012204203] - Nhập môn ngành công nghệ thông tin</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-xs rounded">GPS Auto</span></td>
+              <td class="py-3 px-4 text-center">6</td>
+              <td class="py-3 px-4 text-center font-semibold text-emerald-400">12 / 12</td>
+              <td class="py-3 px-4 text-center font-bold text-emerald-400">100.0%</td>
+              <td class="py-3 px-4 text-right"><button onclick="switchTab('this-course')" class="text-xs text-blue-400 hover:underline">Chi tiết &rarr;</button></td>
+            </tr>
+            <tr class="hover:bg-slate-800/50 transition">
+              <td class="py-3 px-4 font-medium text-white">[012012300212] - Mạng máy tính - 7480201369369</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-xs rounded">Điểm danh</span></td>
+              <td class="py-3 px-4 text-center">10</td>
+              <td class="py-3 px-4 text-center font-semibold text-emerald-400">100 / 100</td>
+              <td class="py-3 px-4 text-center font-bold text-emerald-400">100.0%</td>
+              <td class="py-3 px-4 text-right"><button onclick="switchTab('this-course')" class="text-xs text-blue-400 hover:underline">Chi tiết &rarr;</button></td>
+            </tr>
+            <tr class="hover:bg-slate-800/50 transition bg-blue-900/10 border-l-2 border-blue-500">
+              <td class="py-3 px-4 font-semibold text-blue-300">[HKI2627] - [012012210503] - Công nghệ phần mềm - CNS_CS1</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-xs font-semibold rounded">GPS Geofence</span></td>
+              <td class="py-3 px-4 text-center font-medium" id="taken-sessions-stat">5</td>
+              <td class="py-3 px-4 text-center font-bold text-emerald-400" id="points-stat">45 / 50</td>
+              <td class="py-3 px-4 text-center font-bold text-emerald-400" id="percent-stat">90.0%</td>
+              <td class="py-3 px-4 text-right">
+                <button onclick="goToCourseCheckIn('[HKI2627] - Công nghệ phần mềm', 'B204')" class="text-xs font-bold text-emerald-400 hover:underline bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/30">
+                  Điểm danh ngay &rarr;
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: THIS COURSE (Mô phỏng ảnh chụp số 3 của trường) -->
+    <div id="view-this-course" class="tab-content hidden space-y-4">
+      <div class="bg-[#18202F] border border-slate-700/60 rounded-2xl p-5 shadow-lg overflow-x-auto custom-scrollbar">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+          <div>
+            <div class="text-xs text-blue-400 font-semibold">[HKI2627] - [012012210503]</div>
+            <h2 class="text-lg font-bold text-white">Công nghệ phần mềm (Giảng đường B204)</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-300">Tháng 10 / 2026</span>
+            <button onclick="switchTab('checkin-gps')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow">
+              📍 Check-in GPS ngay
+            </button>
+          </div>
+        </div>
+
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="text-xs uppercase bg-slate-800/80 text-slate-400 border-b border-slate-700">
+            <tr>
+              <th class="py-3 px-4">Ngày & Giờ (Date)</th>
+              <th class="py-3 px-4">Mô tả (Description)</th>
+              <th class="py-3 px-4 text-center">Trạng thái (Status)</th>
+              <th class="py-3 px-4 text-center">Điểm (Points)</th>
+              <th class="py-3 px-4">Ghi chú (Remarks)</th>
+            </tr>
+          </thead>
+          <tbody id="attendance-rows" class="divide-y divide-slate-800">
+            <tr class="hover:bg-slate-800/40">
+              <td class="py-3 px-4 font-medium text-white">Tue 6 Oct 2026<div class="text-xs text-slate-400">07:00 AM - 09:20 AM</div></td>
+              <td class="py-3 px-4">Regular class session</td>
+              <td class="py-3 px-4 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Present</span></td>
+              <td class="py-3 px-4 text-center font-bold text-emerald-400">10 / 10</td>
+              <td class="py-3 px-4 text-xs text-slate-400">Self-recorded via GPS (07:05 AM - Đúng giờ)</td>
+            </tr>
+            <tr class="hover:bg-slate-800/40">
+              <td class="py-3 px-4 font-medium text-white">Tue 13 Oct 2026<div class="text-xs text-slate-400">07:00 AM - 09:20 AM</div></td>
+              <td class="py-3 px-4">Regular class session</td>
+              <td class="py-3 px-4 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Late</span></td>
+              <td class="py-3 px-4 text-center font-bold text-amber-400">5 / 10</td>
+              <td class="py-3 px-4 text-xs text-slate-400">Self-recorded via GPS (07:18 AM - Trễ 8 phút)</td>
+            </tr>
+            <tr class="hover:bg-slate-800/40">
+              <td class="py-3 px-4 font-medium text-white">Tue 20 Oct 2026<div class="text-xs text-slate-400">07:00 AM - 09:20 AM</div></td>
+              <td class="py-3 px-4">Regular class session</td>
+              <td class="py-3 px-4 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Present</span></td>
+              <td class="py-3 px-4 text-center font-bold text-emerald-400">10 / 10</td>
+              <td class="py-3 px-4 text-xs text-slate-400">Self-recorded via GPS (07:08 AM - Đúng giờ)</td>
+            </tr>
+            <tr class="hover:bg-slate-800/40">
+              <td class="py-3 px-4 font-medium text-white">Tue 27 Oct 2026<div class="text-xs text-slate-400">07:00 AM - 09:20 AM</div></td>
+              <td class="py-3 px-4">Regular class session</td>
+              <td class="py-3 px-4 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Present</span></td>
+              <td class="py-3 px-4 text-center font-bold text-emerald-400">10 / 10</td>
+              <td class="py-3 px-4 text-xs text-slate-400">Self-recorded via GPS (07:04 AM - Đúng giờ)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="mt-5 p-4 bg-slate-800/60 rounded-xl border border-slate-700 flex flex-wrap gap-6 text-sm">
+          <div><span class="text-slate-400">Tổng số ca:</span> <strong id="summary-taken" class="text-white">4</strong></div>
+          <div><span class="text-slate-400">Điểm chuyên cần:</span> <strong id="summary-points" class="text-emerald-400">35 / 40</strong></div>
+          <div><span class="text-slate-400">Tỷ lệ chuyên cần:</span> <strong id="summary-percent" class="text-emerald-400">87.5%</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: SINH VIÊN CHECK-IN GPS (MÔ PHỎNG TƯƠNG TÁC THỰC TẾ) -->
+    <div id="view-checkin-gps" class="tab-content hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Cột trái: Bộ điều khiển tình huống thử nghiệm (Simulator Sandbox) -->
+        <div class="lg:col-span-5 bg-[#18202F] border border-slate-700/60 rounded-2xl p-5 shadow-lg space-y-4">
+          <div class="border-b border-slate-700 pb-3">
+            <h3 class="font-bold text-white text-base flex items-center gap-2">
+              <span>⚙️</span> Thử nghiệm các kịch bản thực tế
+            </h3>
+            <p class="text-xs text-slate-400">Chọn tình huống dưới đây để kiểm tra phản ứng của hệ thống</p>
+          </div>
+
+          <!-- Scenario selection buttons -->
+          <div class="space-y-2">
+            <button onclick="setScenario('ontime')" id="btn-ontime" class="w-full text-left p-3 rounded-xl border transition text-xs flex justify-between items-center bg-blue-600/20 border-blue-500 text-blue-200">
+              <div>
+                <div class="font-bold text-sm text-white">1. Đúng giờ (5-10 phút đầu)</div>
+                <div class="text-slate-400">Thời gian: 07:06 AM | Cách phòng: 12 mét</div>
+              </div>
+              <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 font-bold rounded">10/10 điểm</span>
+            </button>
+
+            <button onclick="setScenario('late')" id="btn-late" class="w-full text-left p-3 rounded-xl border transition text-xs flex justify-between items-center bg-slate-800/80 border-slate-700 hover:border-slate-600 text-slate-300">
+              <div>
+                <div class="font-bold text-sm text-white">2. Đi trễ (Sau phút thứ 10)</div>
+                <div class="text-slate-400">Thời gian: 07:18 AM | Cách phòng: 15 mét</div>
+              </div>
+              <span class="px-2 py-0.5 bg-amber-500/20 text-amber-300 font-bold rounded">5/10 điểm</span>
+            </button>
+
+            <button onclick="setScenario('outside')" id="btn-outside" class="w-full text-left p-3 rounded-xl border transition text-xs flex justify-between items-center bg-slate-800/80 border-slate-700 hover:border-slate-600 text-slate-300">
+              <div>
+                <div class="font-bold text-sm text-white">3. Ở ngoài phòng (Quán cafe)</div>
+                <div class="text-slate-400">Thời gian: 07:05 AM | Cách phòng: 135 mét</div>
+              </div>
+              <span class="px-2 py-0.5 bg-red-500/20 text-red-300 font-bold rounded">Từ chối</span>
+            </button>
+
+            <button onclick="setScenario('fakegps')" id="btn-fakegps" class="w-full text-left p-3 rounded-xl border transition text-xs flex justify-between items-center bg-slate-800/80 border-slate-700 hover:border-slate-600 text-slate-300">
+              <div>
+                <div class="font-bold text-sm text-white">4. Bật phần mềm Fake GPS</div>
+                <div class="text-slate-400">Phát hiện cờ Mock Location trên Android</div>
+              </div>
+              <span class="px-2 py-0.5 bg-purple-500/20 text-purple-300 font-bold rounded">Chặn gian lận</span>
+            </button>
+          </div>
+
+          <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/60 text-xs text-slate-400 space-y-1">
+            <div>📍 <strong>Tâm phòng B204:</strong> 10.823098, 106.629663</div>
+            <div>🎯 <strong>Bán kính cho phép (R):</strong> 35 mét</div>
+            <div>🕒 <strong>Đồng hồ Server:</strong> <span id="server-time" class="text-blue-400 font-mono font-bold">07:06:12 AM</span></div>
+          </div>
+        </div>
+
+        <!-- Cột phải: Màn hình điện thoại của sinh viên -->
+        <div class="lg:col-span-7 bg-[#18202F] border border-slate-700/60 rounded-2xl p-6 shadow-lg flex flex-col items-center justify-center">
+          
+          <div class="w-full max-w-sm bg-slate-900 border-2 border-slate-700 rounded-3xl p-5 shadow-2xl space-y-4">
+            
+            <!-- Mobile Header -->
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+              <span class="text-xs font-bold text-blue-400">Ca học: 07:00 - 09:20</span>
+              <span class="text-[12px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded-full">Phiên đang mở</span>
+            </div>
+
+            <!-- Course title -->
+            <div>
+              <div class="text-xs text-slate-400">Môn học đang chọn:</div>
+              <div id="checkin-current-course-title" class="font-bold text-white text-sm">Công nghệ phần mềm</div>
+              <div class="text-xs text-slate-300">Giảng đường: <strong id="checkin-current-room">Phòng B204</strong> (Tầng 2)</div>
+            </div>
+
+            <!-- Radar Visualizer Canvas -->
+            <div class="relative flex items-center justify-center py-2">
+              <canvas id="mobile-radar-canvas" width="220" height="220" class="rounded-full bg-slate-950 border border-slate-800 shadow-inner"></canvas>
+            </div>
+
+            <!-- Real-time metrics -->
+            <div class="grid grid-cols-2 gap-2 text-center text-xs">
+              <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                <div class="text-slate-400 text-[12px]">Khoảng cách tới lớp</div>
+                <div id="display-distance" class="text-white font-bold text-sm mt-0.5">12.4 mét</div>
+              </div>
+              <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                <div class="text-slate-400 text-[12px]">Độ chính xác GPS</div>
+                <div id="display-accuracy" class="text-emerald-400 font-bold text-sm mt-0.5">± 4 mét</div>
+              </div>
+            </div>
+
+            <!-- Big Action Button -->
+            <button onclick="handleCheckIn()" id="btn-submit-checkin" class="w-full py-3.5 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/25 active:scale-95">
+              <span>📍</span> XÁC THỰC GPS & ĐIỂM DANH
+            </button>
+
+            <!-- Dynamic Result Alert Box -->
+            <div id="checkin-result-box" class="hidden p-3.5 rounded-xl text-xs space-y-1"></div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 4: MÀN HÌNH GIẢNG VIÊN (LIVE RADAR PHÒNG HỌC) -->
+    <div id="view-lecturer-radar" class="tab-content hidden space-y-4">
+      <div class="bg-[#18202F] border border-slate-700/60 rounded-2xl p-5 shadow-lg">
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-700/80 pb-4 mb-5">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+              Radar Giám Sát Thời Gian Thực - Phòng B204
+            </h2>
+            <p class="text-xs text-slate-400">Lớp Công nghệ phần mềm (Sĩ số: 60) | Bán kính quét: 35m</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="simulateAddStudent()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold">
+              + Mô phỏng SV check-in
+            </button>
+            <button onclick="alert('Đã xuất báo cáo chuyên cần ra file Excel thành công!')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-xs font-semibold">
+              📥 Xuất file Excel
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Metrics Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5 text-center">
+          <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+            <div class="text-xs text-slate-400">Sĩ số lớp</div>
+            <div class="text-xl font-bold text-white mt-1">60</div>
+          </div>
+          <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+            <div class="text-xs text-slate-400">Có mặt đúng giờ (Present)</div>
+            <div id="kpi-present" class="text-xl font-bold text-emerald-400 mt-1">52</div>
+          </div>
+          <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+            <div class="text-xs text-slate-400">Đi trễ (Late)</div>
+            <div id="kpi-late" class="text-xl font-bold text-amber-400 mt-1">4</div>
+          </div>
+          <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+            <div class="text-xs text-slate-400">Chưa check-in / Vắng</div>
+            <div id="kpi-absent" class="text-xl font-bold text-red-400 mt-1">4</div>
+          </div>
+        </div>
+
+        <!-- Radar Canvas and Live Feed -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-7 flex flex-col items-center justify-center p-4 bg-slate-900/80 rounded-2xl border border-slate-800">
+            <div class="text-xs font-bold text-slate-400 mb-2">BẢN ĐỒ GEOFENCE PHÒNG B204 (TÂM XANH LỤC = GIẢNG ĐƯỜNG)</div>
+            <canvas id="lecturer-radar-canvas" width="360" height="300" class="rounded-xl bg-slate-950 border border-slate-800 shadow"></canvas>
+            <div class="flex gap-4 mt-3 text-xs text-slate-400">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Đúng giờ (Present)</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Đi trễ (Late)</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Ngoài phòng học</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 bg-slate-900/80 rounded-2xl border border-slate-800 p-4 flex flex-col">
+            <div class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Nhật ký Check-in trực tiếp (Live Feed)</div>
+            <div id="live-feed-list" class="space-y-2 text-xs overflow-y-auto max-h-[250px] custom-scrollbar pr-1">
+              <div class="p-2 rounded bg-slate-800/60 border border-slate-700/50 flex justify-between items-center">
+                <div>
+                  <span class="font-bold text-white">Nguyễn Văn An</span> (B22DCCN012)
+                  <div class="text-[12px] text-slate-400">Cách 10m • 07:04:15 AM</div>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">Present</span>
+              </div>
+              <div class="p-2 rounded bg-slate-800/60 border border-slate-700/50 flex justify-between items-center">
+                <div>
+                  <span class="font-bold text-white">Lê Thị Bích</span> (B22DCCN045)
+                  <div class="text-[12px] text-slate-400">Cách 18m • 07:07:30 AM</div>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">Present</span>
+              </div>
+              <div class="p-2 rounded bg-slate-800/60 border border-slate-700/50 flex justify-between items-center">
+                <div>
+                  <span class="font-bold text-white">Phạm Minh Đức</span> (B22DCCN088)
+                  <div class="text-[12px] text-slate-400">Cách 14m • 07:16:10 AM</div>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">Late (Trễ 6p)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // User Session State
+    let currentUser = null;
+
+    // Current test scenario state
+    let currentScenario = 'ontime';
+    let hasCheckedInToday = false;
+
+    // Simulation Data Config
+    const SCENARIOS = {
+      ontime: {
+        name: 'Đúng giờ',
+        distance: 12.4,
+        accuracy: '± 4 mét',
+        time: '07:06:15 AM',
+        isMock: false,
+        status: 'Present',
+        points: '10/10',
+        remarks: 'Self-recorded via GPS (07:06 AM - Đúng giờ)'
+      },
+      late: {
+        name: 'Đi trễ',
+        distance: 15.2,
+        accuracy: '± 5 mét',
+        time: '07:18:40 AM',
+        isMock: false,
+        status: 'Late',
+        points: '5/10',
+        remarks: 'Self-recorded via GPS (07:18 AM - Trễ 8 phút)'
+      },
+      outside: {
+        name: 'Ngoài phòng',
+        distance: 135.0,
+        accuracy: '± 8 mét',
+        time: '07:05:20 AM',
+        isMock: false,
+        status: 'Rejected',
+        points: '0/10',
+        remarks: 'Từ chối: Khoảng cách vượt quá bán kính cho phép (35m)'
+      },
+      fakegps: {
+        name: 'Fake GPS',
+        distance: 5.0,
+        accuracy: '± 1 mét',
+        time: '07:06:00 AM',
+        isMock: true,
+        status: 'Blocked',
+        points: '0/10',
+        remarks: 'Bị chặn: Phát hiện ứng dụng giả lập tọa độ'
+      }
+    };
+
+    // Role switcher on Login Form
+    let currentLoginRole = 'student';
+    function selectLoginRole(role) {
+      currentLoginRole = role;
+      const btnStu = document.getElementById('role-btn-student');
+      const btnLec = document.getElementById('role-btn-lecturer');
+      const labelUser = document.getElementById('label-username');
+      const inputUser = document.getElementById('input-username');
+
+      if (role === 'student') {
+        btnStu.className = 'py-2 text-xs font-bold rounded-xl transition bg-blue-600 text-white shadow';
+        btnLec.className = 'py-2 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white';
+        labelUser.innerText = 'Mã số sinh viên (MSSV)';
+        inputUser.value = 'B22DCCN001';
+      } else {
+        btnLec.className = 'py-2 text-xs font-bold rounded-xl transition bg-amber-600 text-white shadow';
+        btnStu.className = 'py-2 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white';
+        labelUser.innerText = 'Mã giảng viên / Email trường';
+        inputUser.value = 'GV_CNPM_01';
+      }
+    }
+
+    function quickFill(username, role) {
+      selectLoginRole(role);
+      document.getElementById('input-username').value = username;
+      document.getElementById('input-password').value = '123456';
+    }
+
+    // Handle Login Form Submit
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-login');
+      btn.innerHTML = `<span>⏳ Đang nhận diện thiết bị & đăng nhập...</span>`;
+      btn.disabled = true;
+
+      setTimeout(() => {
+        const username = document.getElementById('input-username').value;
+        const role = currentLoginRole;
+
+        currentUser = {
+          username: username,
+          role: role,
+          fullName: role === 'student' ? 'Trần Đức Khang (B22DCCN001)' : 'ThS. Nguyễn Văn A (GV_CNPM)',
+          sub: role === 'student' ? 'Lớp: D22CQCN01-N | Sinh viên' : 'Bộ môn Công nghệ phần mềm | Giảng viên'
+        };
+
+        // Transition from Login to Main App
+        document.getElementById('login-container').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+
+        // Update Header UI
+        document.getElementById('header-user-name').innerText = currentUser.fullName;
+        document.getElementById('header-user-role').innerText = currentUser.sub;
+        document.getElementById('header-avatar').innerText = role === 'student' ? 'SV' : 'GV';
+        document.getElementById('header-avatar').className = role === 'student' 
+          ? 'w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-xs text-white'
+          : 'w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center font-bold text-xs text-white';
+
+        // Direct to appropriate initial tab
+        if (role === 'lecturer') {
+          document.getElementById('today-schedule-banner').classList.add('hidden');
+          switchTab('lecturer-radar');
+        } else {
+          document.getElementById('today-schedule-banner').classList.remove('hidden');
+          switchTab('all-courses');
+        }
+
+        btn.innerHTML = `<span>Đăng nhập vào hệ thống</span><span>&rarr;</span>`;
+        btn.disabled = false;
+      }, 500);
+    }
+
+    // Direct 1-touch jump from Today's Schedule to GPS Checkin
+    function goToCourseCheckIn(courseName, roomName) {
+      document.getElementById('checkin-current-course-title').innerText = courseName;
+      document.getElementById('checkin-current-room').innerText = `Phòng ${roomName}`;
+      switchTab('checkin-gps');
+    }
+
+    // Handle Logout Action
+    function handleLogout() {
+      if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
+        currentUser = null;
+        document.getElementById('main-app').classList.add('hidden');
+        document.getElementById('login-container').classList.remove('hidden');
+      }
+    }
+
+    // Tab Switching Function
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-500/20');
+        btn.classList.add('bg-slate-800', 'text-slate-400');
+      });
+
+      const activeView = document.getElementById(`view-${tabId}`);
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-800', 'text-slate-400');
+        activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-500/20');
+      }
+
+      if (tabId === 'checkin-gps') drawMobileRadar();
+      if (tabId === 'lecturer-radar') drawLecturerRadar();
+    }
+
+    // Set Test Scenario
+    function setScenario(scKey) {
+      currentScenario = scKey;
+      const sc = SCENARIOS[scKey];
+
+      // Update button styles
+      ['ontime', 'late', 'outside', 'fakegps'].forEach(key => {
+        const btn = document.getElementById(`btn-${key}`);
+        if (key === scKey) {
+          btn.className = 'w-full text-left p-3 rounded-xl border transition text-xs flex justify-between items-center bg-blue-600/20 border-blue-500 text-blue-200';
+        } else {
+          btn.className = 'w-full text-left p-3 rounded-xl border transition text-xs flex justify-between items-center bg-slate-800/80 border-slate-700 hover:border-slate-600 text-slate-300';
+        }
+      });
+
+      document.getElementById('display-distance').innerText = `${sc.distance} mét`;
+      document.getElementById('display-accuracy').innerText = sc.accuracy;
+      document.getElementById('server-time').innerText = sc.time;
+
+      // Hide previous result alert
+      const resultBox = document.getElementById('checkin-result-box');
+      resultBox.classList.add('hidden');
+
+      drawMobileRadar();
+    }
+
+    // Draw Mobile Radar Canvas
+    function drawMobileRadar() {
+      const canvas = document.getElementById('mobile-radar-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Draw radar rings
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      [30, 60, 90].forEach(r => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // Geofence Circle (Radius = 35m, visual scale = 50px)
+      const fenceRadius = 55;
+      ctx.beginPath();
+      ctx.arc(cx, cy, fenceRadius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.12)';
+      ctx.fill();
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Center (B204 Classroom)
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#60a5fa';
+      ctx.fill();
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('B204', cx, cy - 10);
+
+      // Student Position Dot based on scenario
+      const sc = SCENARIOS[currentScenario];
+      let studentX = cx;
+      let studentY = cy;
+
+      if (currentScenario === 'ontime') {
+        studentX = cx + 20;
+        studentY = cy + 18;
+      } else if (currentScenario === 'late') {
+        studentX = cx - 25;
+        studentY = cy + 22;
+      } else if (currentScenario === 'outside') {
+        studentX = cx + 85;
+        studentY = cy - 45;
+      } else if (currentScenario === 'fakegps') {
+        studentX = cx + 8;
+        studentY = cy + 8;
+      }
+
+      ctx.beginPath();
+      ctx.arc(studentX, studentY, 7, 0, Math.PI * 2);
+      if (currentScenario === 'ontime') ctx.fillStyle = '#22c55e';
+      else if (currentScenario === 'late') ctx.fillStyle = '#f59e0b';
+      else if (currentScenario === 'outside') ctx.fillStyle = '#ef4444';
+      else ctx.fillStyle = '#a855f7';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('Bạn', studentX, studentY + 18);
+    }
+
+    // Handle Check-in Action
+    function handleCheckIn() {
+      const sc = SCENARIOS[currentScenario];
+      const resultBox = document.getElementById('checkin-result-box');
+      resultBox.classList.remove('hidden');
+
+      if (sc.isMock) {
+        resultBox.className = 'p-3.5 rounded-xl text-xs space-y-1 bg-purple-950/70 border border-purple-500/50 text-purple-200';
+        resultBox.innerHTML = `
+          <div class="font-bold text-sm text-purple-300">🚨 PHÁT HIỆN GIAN LẬN VỊ TRÍ!</div>
+          <div>Hệ thống phát hiện thiết bị đang bật Mock Location (Fake GPS). Yêu cầu tắt ứng dụng vị trí ảo để điểm danh.</div>
+        `;
+        return;
+      }
+
+      if (sc.distance > 35) {
+        resultBox.className = 'p-3.5 rounded-xl text-xs space-y-1 bg-red-950/70 border border-red-500/50 text-red-200';
+        resultBox.innerHTML = `
+          <div class="font-bold text-sm text-red-400">❌ ĐIỂM DANH THẤT BẠI!</div>
+          <div>Bạn đang cách phòng học <strong>${sc.distance}m</strong> (Bán kính cho phép là 35m). Hãy di chuyển vào phòng B204 và thử lại.</div>
+        `;
+        return;
+      }
+
+      if (sc.status === 'Present') {
+        resultBox.className = 'p-3.5 rounded-xl text-xs space-y-1 bg-emerald-950/70 border border-emerald-500/50 text-emerald-200';
+        resultBox.innerHTML = `
+          <div class="font-bold text-sm text-emerald-400">🎉 ĐIỂM DANH THÀNH CÔNG (ĐÚNG GIỜ)!</div>
+          <div>Trạng thái: <strong>Present (Có mặt)</strong> • Điểm: <strong>10/10</strong></div>
+          <div class="text-[12px] opacity-80">Ghi nhận: ${sc.time} | Khoảng cách: ${sc.distance}m | Mã: GPS-OK-7821</div>
+        `;
+        updateAttendanceTable('Present', '10 / 10', 'Self-recorded via GPS (Hôm nay - Đúng giờ)');
+      } else if (sc.status === 'Late') {
+        resultBox.className = 'p-3.5 rounded-xl text-xs space-y-1 bg-amber-950/70 border border-amber-500/50 text-amber-200';
+        resultBox.innerHTML = `
+          <div class="font-bold text-sm text-amber-400">⚠️ ĐIỂM DANH THÀNH CÔNG (ĐI TRỄ)!</div>
+          <div>Bạn điểm danh sau 10 phút đầu ca học. Trạng thái: <strong>Late (5/10 điểm)</strong></div>
+          <div class="text-[12px] opacity-80">Ghi nhận: ${sc.time} | Khoảng cách: ${sc.distance}m | Mã: GPS-LATE-3914</div>
+        `;
+        updateAttendanceTable('Late', '5 / 10', 'Self-recorded via GPS (Hôm nay - Trễ)');
+      }
+    }
+
+    // Update Attendance Table in Tab 2 & Tab 1
+    function updateAttendanceTable(status, points, remarks) {
+      if (hasCheckedInToday) return;
+      hasCheckedInToday = true;
+
+      const tbody = document.getElementById('attendance-rows');
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-slate-800/40 bg-blue-900/10 border-l-2 border-blue-500 animate-pulse';
+
+      const badgeClass = status === 'Present' 
+        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' 
+        : 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+
+      tr.innerHTML = `
+        <td class="py-3 px-4 font-medium text-white">Hôm nay (31 Oct 2026)<div class="text-xs text-slate-400">07:00 AM - 09:20 AM</div></td>
+        <td class="py-3 px-4">Regular class session (GPS Live)</td>
+        <td class="py-3 px-4 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-bold border ${badgeClass}">${status}</span></td>
+        <td class="py-3 px-4 text-center font-bold ${status === 'Present' ? 'text-emerald-400' : 'text-amber-400'}">${points}</td>
+        <td class="py-3 px-4 text-xs text-slate-400">${remarks}</td>
+      `;
+
+      tbody.appendChild(tr);
+
+      // Update counters
+      const pts = status === 'Present' ? 45 : 40;
+      document.getElementById('summary-taken').innerText = '5';
+      document.getElementById('summary-points').innerText = `${pts} / 50`;
+      document.getElementById('summary-percent').innerText = `${(pts / 50 * 100).toFixed(1)}%`;
+
+      document.getElementById('taken-sessions-stat').innerText = '5';
+      document.getElementById('points-stat').innerText = `${pts} / 50`;
+      document.getElementById('percent-stat').innerText = `${(pts / 50 * 100).toFixed(1)}%`;
+    }
+
+    // Draw Lecturer Classroom Radar
+    function drawLecturerRadar() {
+      const canvas = document.getElementById('lecturer-radar-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Background grids
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      [40, 80, 120].forEach(r => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // 35m Geofence
+      const fenceRadius = 85;
+      ctx.beginPath();
+      ctx.arc(cx, cy, fenceRadius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.08)';
+      ctx.fill();
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Center (Lecturer Desk)
+      ctx.beginPath();
+      ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#3b82f6';
+      ctx.fill();
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Bục giảng B204', cx, cy - 12);
+
+      // Render dots for Present students inside
+      const studentsInside = [
+        {x: cx - 30, y: cy - 25, type: 'present'},
+        {x: cx + 45, y: cy + 15, type: 'present'},
+        {x: cx - 50, y: cy + 40, type: 'present'},
+        {x: cx + 25, y: cy - 45, type: 'present'},
+        {x: cx - 20, y: cy + 55, type: 'present'},
+        {x: cx + 60, y: cy - 20, type: 'present'},
+        {x: cx + 10, y: cy + 65, type: 'late'},
+        {x: cx - 65, y: cy - 35, type: 'late'},
+        {x: cx + 140, y: cy + 30, type: 'outside'},
+        {x: cx - 135, y: cy - 60, type: 'outside'}
+      ];
+
+      studentsInside.forEach(st => {
+        ctx.beginPath();
+        ctx.arc(st.x, st.y, 5, 0, Math.PI * 2);
+        if (st.type === 'present') ctx.fillStyle = '#10b981';
+        else if (st.type === 'late') ctx.fillStyle = '#f59e0b';
+        else ctx.fillStyle = '#ef4444';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+    }
+
+    function simulateAddStudent() {
+      const names = ['Hoàng Thị Mai', 'Vũ Quốc Trung', 'Đặng Tuấn Kiệt', 'Bùi Ngọc Lan'];
+      const randomName = names[Math.floor(Math.random() * names.length)];
+      const liveList = document.getElementById('live-feed-list');
+
+      const item = document.createElement('div');
+      item.className = 'p-2 rounded bg-slate-800/60 border border-slate-700/50 flex justify-between items-center animate-bounce';
+      item.innerHTML = `
+        <div>
+          <span class="font-bold text-white">${randomName}</span>
+          <div class="text-[12px] text-slate-400">Cách 11m • Vừa xong</div>
+        </div>
+        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">Present</span>
+      `;
+
+      liveList.prepend(item);
+
+      const kpi = document.getElementById('kpi-present');
+      kpi.innerText = parseInt(kpi.innerText) + 1;
+    }
+  </script>
+</body>
+</html>
