@@ -315,6 +315,6 @@ System implementation and software testing are subsequent development stages.
 
 The project documentation and source code will be updated as the team completes and reviews each deliverable.
 
-## 11. Collaboration and Version Control
+## 11. Collaboration and Version Control.
 
 The team uses **GitHub
