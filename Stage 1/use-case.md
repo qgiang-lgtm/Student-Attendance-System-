@@ -1,6 +1,6 @@
 ## V. USE CASE DIAGRAM & DETAILED SPECIFICATIONS
 ### 1. Comprehensive Use Case Diagram
- ![img.png](img.png)
+ ![img.png](ui/img.png)
 ---
 ### 2. Detailed Use Case Specifications
 
