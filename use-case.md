@@ -1,8 +1,8 @@
-## 4. USE CASE DIAGRAM & DETAILED SPECIFICATIONS
+## V. USE CASE DIAGRAM & DETAILED SPECIFICATIONS
 
-### 4.2. Detailed Use Case Specifications
+### 2. Detailed Use Case Specifications
 
-#### 4.2.1. Use Case UC01: Universal Authentication & Smart Admin Auto-Routing
+#### 2.1. Use Case UC01: Universal Authentication & Smart Admin Auto-Routing
 * **Use Case ID:** `UC01`
 * **Primary Actors:** Student, Lecturer, Administrator (Admin).
 * **Summary:** Authenticates users into the system via a unified login interface presenting dual role tabs. Administrators can submit credentials into either tab, and the system automatically routes them to the Admin Portal based on database role attributes.
@@ -24,7 +24,7 @@
 
 ---
 
-#### 4.2.2. Use Case UC04: Perform 1-Tap GPS Attendance Check-in
+#### 2.2. Use Case UC04: Perform 1-Tap GPS Attendance Check-in
 * **Use Case ID:** `UC04`
 * **Primary Actor:** Student.
 * **Summary:** The student records attendance for the current class using their device's GPS hardware. The server calculates spherical distance and checks the timestamp against the 15-minute rules to award 10 points (on-time) or 5 points (late).
@@ -46,5 +46,66 @@
     * *E1 - Outside Geofence Perimeter ($d > R$):* System rejects check-in: *"You are outside the classroom boundary (Measured distance: [d]m, Allowed radius: [R]m)."* Point balance remains 0/10.
     * *E2 - Location Permission Denied:* System presents instructions on enabling browser location services.
     * *E3 - Fake GPS / Mock Location Detected:* System aborts check-in and logs a security infraction.
+
+---
+
+#### 2.3. Use Case UC05: Submit Leave Request & Upload Digital Evidence
+* **Use Case ID:** `UC05`
+* **Primary Actor:** Student.
+* **Summary:** A student unable to attend a class submits a formal digital leave request with supporting evidence (medical slips, hospital receipts, official convocations) to be evaluated for Excused Absence (2/10 points).
+* **Pre-conditions:** Student is logged in and selects the designated class session.
+* **Basic Execution Flow:**
+    1. The student navigates to the session details or clicks `[ 📄 Submit Leave Request / Proof ]` on the class card.
+    2. The system displays the Leave Application Modal.
+    3. The student specifies the category (Illness, Family Emergency, University Activity, Other).
+    4. The student types a comprehensive explanation.
+    5. The student clicks `[ Select Proof File ]` to attach a photograph (JPG, PNG) or PDF document (medical certificate).
+    6. The student clicks `[ Submit Request to Lecturer ]`.
+    7. The system uploads the proof file to encrypted storage, creates an entry in `leave_requests` with status `PENDING`, and alerts the instructor.
+
+---
+
+#### 2.4. Use Case UC10: Adjudicate Leave Request & Award Points
+* **Use Case ID:** `UC10`
+* **Primary Actor:** Lecturer.
+* **Summary:** The lecturer inspects the submitted explanation and digital medical/official proof to approve (Excused: 2/10 points) or reject (Unexcused: 0/10 points) the absence.
+* **Basic Execution Flow:**
+    1. The lecturer navigates to the `[ Leave Requests Queue ]` for their course class.
+    2. The system lists all pending submissions with Student Code, Name, Date, Reason, and Proof Attachment.
+    3. The lecturer clicks the attachment preview to review the medical slip and hospital stamp.
+    4. **Adjudication Choice:**
+        * **Approval:** The lecturer clicks `[ Approve as Excused ]`. The system updates the attendance log: Status = **Excused Absence**, **Score = 2 / 10 Points**.
+        * **Rejection:** The lecturer clicks `[ Reject Request ]` and provides feedback (e.g., *"Proof lacks hospital seal"*). Status = **Unexcused Absence**, **Score = 0 / 10 Points**.
+    5. The student receives an instant notification of the adjudication result.
+
+---
+#### 2.3. Use Case UC05: Submit Leave Request & Upload Digital Evidence
+* **Use Case ID:** `UC05`
+* **Primary Actor:** Student.
+* **Summary:** A student unable to attend a class submits a formal digital leave request with supporting evidence (medical slips, hospital receipts, official convocations) to be evaluated for Excused Absence (2/10 points).
+* **Pre-conditions:** Student is logged in and selects the designated class session.
+* **Basic Execution Flow:**
+    1. The student navigates to the session details or clicks `[ 📄 Submit Leave Request / Proof ]` on the class card.
+    2. The system displays the Leave Application Modal.
+    3. The student specifies the category (Illness, Family Emergency, University Activity, Other).
+    4. The student types a comprehensive explanation.
+    5. The student clicks `[ Select Proof File ]` to attach a photograph (JPG, PNG) or PDF document (medical certificate).
+    6. The student clicks `[ Submit Request to Lecturer ]`.
+    7. The system uploads the proof file to encrypted storage, creates an entry in `leave_requests` with status `PENDING`, and alerts the instructor.
+
+---
+
+#### 2.4. Use Case UC10: Adjudicate Leave Request & Award Points
+* **Use Case ID:** `UC10`
+* **Primary Actor:** Lecturer.
+* **Summary:** The lecturer inspects the submitted explanation and digital medical/official proof to approve (Excused: 2/10 points) or reject (Unexcused: 0/10 points) the absence.
+* **Basic Execution Flow:**
+    1. The lecturer navigates to the `[ Leave Requests Queue ]` for their course class.
+    2. The system lists all pending submissions with Student Code, Name, Date, Reason, and Proof Attachment.
+    3. The lecturer clicks the attachment preview to review the medical slip and hospital stamp.
+    4. **Adjudication Choice:**
+        * **Approval:** The lecturer clicks `[ Approve as Excused ]`. The system updates the attendance log: Status = **Excused Absence**, **Score = 2 / 10 Points**.
+        * **Rejection:** The lecturer clicks `[ Reject Request ]` and provides feedback (e.g., *"Proof lacks hospital seal"*). Status = **Unexcused Absence**, **Score = 0 / 10 Points**.
+    5. The student receives an instant notification of the adjudication result.
 
 ---
