@@ -1,0 +1,282 @@
+## 7. USER INTERFACE (UI/UX) DESIGN SPECIFICATIONS & WIREFRAMES
+
+### 7.1. Screen 1: Smart Dual-Role Authentication Screen (Universal Login)
+* **Functional Logic:**
+  * Renders two primary role selector tabs: `[ 👨‍🎓 Student ]` and `[ 👨‍🏫 Lecturer ]`.
+  * **Admin Universal Capability:** Administrators do not need a special URL; entering admin credentials into either tab automatically triggers role validation and redirects to the Admin Portal.
+  * Displays the client's computed hardware device fingerprint at the bottom of the card for transparency.
+
+```
++-------------------------------------------------------------------------------+
+|                      SMART GPS STUDENT ATTENDANCE SYSTEM                      |
+|                           UNIVERSITY OF TECHNOLOGY                            |
++-------------------------------------------------------------------------------+
+|                                                                               |
+|                   +---------------------------------------+                   |
+|                   |            AUTHENTICATION             |                   |
+|                   +-------------------+-------------------+                   |
+|                   |  [x] STUDENT      |   [ ] LECTURER    |                   |
+|                   +-------------------+-------------------+                   |
+|                   |                                       |                   |
+|                   |  User Identifier (Student ID / Code): |                   |
+|                   |  [ B22DCCN001                       ] |                   |
+|                   |                                       |                   |
+|                   |  Password:                            |                   |
+|                   |  [ **********                       ] |                   |
+|                   |                                       |                   |
+|                   |  (*) Notice: System Administrators    |                   |
+|                   |  may log in via either tab!           |                   |
+|                   |                                       |                   |
+|                   |  +---------------------------------+  |                   |
+|                   |  |      LOG IN TO SYSTEM ->        |  |                   |
+|                   |  +---------------------------------+  |                   |
+|                   |                                       |                   |
+|                   |  📱 Client Device ID: DEV-IP15-9921                       |
+|                   +---------------------------------------+                   |
+|                                                                               |
++-------------------------------------------------------------------------------+
+```
+
+---
+
+### 7.2. Screen 2: Today's Schedule & 15-Minute Early Trigger Hero Banner
+* **Functional Logic:**
+  * Appears immediately at the top of the Student Dashboard upon login.
+  * Exactly 15 minutes before scheduled start ($T_{start} - 15$), the card transitions to active state (`🟢 GPS CHECK-IN ACTIVE`), showing a live countdown timer for the 10/10 on-time window and the prominent 1-tap check-in button.
+
+```
++-------------------------------------------------------------------------------+
+| [LOGO] SmartAttendance | Dashboard | All Courses | Leave Requests | [B22DCCN001] |
++-------------------------------------------------------------------------------+
+|                                                                               |
+|  🔔 TODAY'S SCHEDULE & ATTENDANCE (Tuesday, Nov 01, 2026 - Server Time: 06:50)  |
+|  ===========================================================================  |
+|                                                                               |
+|  +-------------------------------------------------------------------------+  |
+|  | [SESSION 1: GPS CHECK-IN NOW ACTIVE] (Starts 07:00 AM - Room B204)       |  |
+|  | Course: [CS301] - Software Engineering (Section 01)                     |  |
+|  | Instructor: Dr. Alexander Vance | Allowed Radius: 35 meters             |  |
+|  |                                                                         |  |
+|  | ⏰ RULE: Check in within 15' before/after start for FULL 10/10 POINTS   |  |
+|  | ⏳ Time remaining for 10/10 On-time score: 24 mins 45 secs             |  |
+|  |                                                                         |  |
+|  |  +-------------------------------------------------------------------+  |  |
+|  |  |           [ 📍 CHECK-IN VIA GPS NOW (1-TAP VERIFICATION) ]        |  |  |
+|  |  +-------------------------------------------------------------------+  |  |
+|  |                                                                         |  |
+|  |  [ Or: 📄 Submit Leave Request & Proof if unable to attend in person ]  |  |
+|  +-------------------------------------------------------------------------+  |
+|                                                                               |
+|  +-------------------------------------------------------------------------+  |
+|  | [SESSION 2: UPCOMING LATER TODAY] (09:30 AM - 11:50 AM - Room A301)     |  |
+|  | Course: [CS302] - Computer Networks | Instructor: Dr. Robert Lang       |  |
+|  | Status: 🔒 Locked (Opens at 09:15 AM - exactly 15 minutes prior)        |  |
+|  +-------------------------------------------------------------------------+  |
++-------------------------------------------------------------------------------+
+```
+
+---
+
+### 7.3. Screen 3: GPS Geofence Verification & Result Confirmation Screen
+* **Functional Logic:**
+  * Opens the radar scanner measuring actual client GPS coordinates against room coordinates.
+  * Automatically calculates distance. If $\le 35\text{m}$, registers a green tick mark and grants 10/10 points (on-time) or 5/10 points (if past 15 minutes).
+
+```
++-------------------------------------------------------------------------------+
+|  <-- Back to Dashboard              GPS ATTENDANCE SCANNER                    |
++-------------------------------------------------------------------------------+
+|  Course: [CS301] Software Engineering | Room: B204 (2nd Floor, Bldg B)        |
+|  Authoritative NTP Time: 06:52:10 AM (8 minutes prior to nominal start)       |
+|                                                                               |
+|                         [ GEOFENCE RADAR SCANNER ]                            |
+|                                                                               |
+|                                  ( • )                                        |
+|                           Room B204 Center Anchor                             |
+|                                  / \                                          |
+|                                 /   \  Measured Distance: 12.5 meters         |
+|                                /     \ (Allowed Radius: 35m)                  |
+|                               ( 📍 )                                          |
+|                         Your Verified Position                                |
+|                                                                               |
+|  [✓] GPS Signal: Strong (Estimated Accuracy: ±4 meters)                       |
+|  [✓] Device Integrity: Verified (iPhone 15 - ID: DEV-IP15-9921)               |
+|  [✓] Anti-Spoofing: No Mock Location / Fake GPS detected                     |
+|                                                                               |
+|  +-------------------------------------------------------------------------+  |
+|  |                   ATTENDANCE CONFIRMATION SUCCESS                       |  |
+|  |  Recorded Status: PRESENT (ON-TIME)                                     |  |
+|  |  Attendance Points Awarded: 10 / 10 POINTS                              |  |
+|  |  Remarks: Self-recorded via GPS (Timestamp: 06:52:10 AM)                |  |
+|  +-------------------------------------------------------------------------+  |
++-------------------------------------------------------------------------------+
+```
+
+---
+
+### 7.4. Screen 4: Leave Request & Medical Evidence Upload Modal
+* **Functional Logic:**
+  * Allows students to select an absence category, enter details, and upload evidence images/PDFs.
+  * Outlines clear grading policies: Lecturer Approval $\rightarrow$ **Excused (2/10 pts)**; Rejection or No Submission $\rightarrow$ **Unexcused (0/10 pts)**.
+
+```
++-------------------------------------------------------------------------------+
+|  <-- Back to Dashboard      SUBMIT LEAVE APPLICATION & PROOF                  |
++-------------------------------------------------------------------------------+
+|  Session: Session 1 - Tuesday (Nov 01, 2026) | Course: Software Engineering   |
+|                                                                               |
+|  Absence Scoring Policy:                                                      |
+|  * LECTURER APPROVES PROOF: Recorded as EXCUSED ABSENCE -> 2 / 10 POINTS      |
+|  * LECTURER REJECTS / NO SUBMISSION: Recorded as UNEXCUSED   -> 0 / 10 POINTS  |
+|                                                                               |
+|  1. Primary Reason for Absence: (*)                                           |
+|  [ Medical Illness / Hospitalization                                       v ]|
+|                                                                               |
+|  2. Detailed Explanation:                                                     |
+|  +-------------------------------------------------------------------------+  |
+|  | High fever and respiratory infection since last night. Currently at the |  |
+|  | University Medical Center for examination. Prescription attached below. |  |
+|  +-------------------------------------------------------------------------+  |
+|                                                                               |
+|  3. Attach Digital Evidence (Doctor's Note, Hospital Slip, Medical Proof):   |
+|  +-------------------------------------------------------------------------+  |
+|  |  [ 📁 Choose File: medical_certificate_nov01.jpg ] (Size: 1.8 MB)       |  |
+|  |  [Preview]: [HOSPITAL DOCTOR NOTE WITH OFFICIAL STAMP AND SIGNATURE]     |  |
+|  +-------------------------------------------------------------------------+  |
+|                                                                               |
+|  +-------------------------------------------------------------------------+  |
+|  |              [ TRANSMIT LEAVE APPLICATION TO INSTRUCTOR ]               |  |
+|  +-------------------------------------------------------------------------+  |
++-------------------------------------------------------------------------------+
+```
+
+---
+
+### 7.5. Screen 5: Academic Attendance Summaries (All Courses & This Course Views)
+
+#### Consolidated Semester Overview (All Courses View)
+```
++-------------------------------------------------------------------------------+
+| [ This Course ]  |  [[ ALL COURSES ]]  |  [ All Sessions ]                    |
++-------------------------------------------------------------------------------+
+| SEMESTER ATTENDANCE & ACADEMIC INTEGRITY OVERVIEW                             |
+|                                                                               |
+| Course Identifier          | Attendance | Taken Sessions | Points | Percentage|
+|----------------------------+------------+----------------+--------+-----------|
+| [CS301] Software Engineer. | Check-in   |       5        | 42/50  |   84.0%   |
+| [CS302] Computer Networks  | Check-in   |       6        | 55/60  |   91.6%   |
+| [CS303] Database Systems   | Check-in   |       8        | 80/80  |  100.0%   |
+| [CS304] Algorithms Design  | Check-in   |       7        | 57/70  |   81.4%   |
+|----------------------------+------------+----------------+--------+-----------|
+| Cumulative Semester Average Attendance Score: 89.2%                           |
++-------------------------------------------------------------------------------+
+```
+
+#### Detailed Course History View (This Course View)
+```
++-------------------------------------------------------------------------------+
+| [[ THIS COURSE ]]  |  [ All Courses ]  |  [ All Sessions ]                    |
+| Course: [CS301] - Software Engineering | Instructor: Dr. Alexander Vance      |
++-------------------------------------------------------------------------------+
+|                                                                               |
+| Date               | Session / Topic | Status (Color Code) | Points | Remarks |
+|--------------------+-----------------+---------------------+--------+---------|
+| Tue 04 Oct 2026    | W01: Intro/SRS  | Present (Green)     | 10/10  | 06:55 AM|
+| Tue 11 Oct 2026    | W02: DFD & UML  | Late (Yellow: 18m)  | 5/10   | 07:18 AM|
+| Tue 18 Oct 2026    | W03: Lab 01     | Present (Green)     | 10/10  | 06:50 AM|
+| Tue 25 Oct 2026    | W04: ERD Design | Excused (Purple)    | 2/10   | Med Doc |
+| Tue 01 Nov 2026    | W05: UI Mockups | Absent (Unexcused)  | 0/10   | Pending |
+|--------------------+-----------------+---------------------+--------+---------|
+| Total Sessions Completed: 4 sessions                                          |
+| Cumulative Attendance Points: 27 / 40 Points (Percentage: 67.5%)              |
++-------------------------------------------------------------------------------+
+```
+
+---
+
+### 7.6. Screen 6: Lecturer Live Geofence Radar Monitoring Dashboard
+* **Functional Logic:**
+  * Interactive live canvas depicting the classroom perimeter.
+  * Real-time markers appear dynamically: Green dots (on-time), Yellow dots (late).
+  * Instant headcount metrics update automatically via WebSockets.
+
+```
++-------------------------------------------------------------------------------+
+| INSTRUCTOR: Dr. Alexander Vance | Course: Software Engineering (CS301-G01)    |
++-------------------------------------------------------------------------------+
+| ACTIVE SESSION: Room B204 (07:00 AM - 09:20 AM)                               |
+| Window Opened: 06:45 AM (15' early) | Late Mark: 07:15 AM | Geofence R: 35m   |
++-------------------------------------------------------------------------------+
+|                                                                               |
+|  [ LIVE CLASSROOM RADAR DISPLAY ]          [ REAL-TIME SESSION STATISTICS ]   |
+|  +-----------------------------+          Class Enrollment: 60 Students       |
+|  |         .  🟢 🟢            |          🟢 Present On-time (10 pts): 48     |
+|  |      🟢   (ANCHOR)  🟢      |          🟡 Late Check-in (5 pts)   : 4      |
+|  |        🟡    🟢             |          🟣 Excused Absence (2 pts) : 2      |
+|  |     [ Boundary R=35m ]      |          🔴 Unrecorded Absent (0 pts): 6     |
+|  |                             |                                              |
+|  | (Out of bounds: 🔴 1 SV)    |          Real-time Attendance Rate: 88.3%    |
+|  +-----------------------------+                                              |
+|                                                                               |
+|  LATEST REAL-TIME CHECK-IN LOGS:                                              |
+|  - 06:58:12 AM: B22DCCN001 - Alexander Tran -> Present (10 pts) [Dist: 12m]   |
+|  - 07:02:45 AM: B22DCCN045 - Maria Nguyen   -> Present (10 pts) [Dist: 8m]    |
+|  - 07:18:20 AM: B22DCCN089 - David Pham     -> Late (5 pts)    [Dist: 15m]   |
+|                                                                               |
+|  [ 📄 Review Leave Applications (2 pending) ]   [ 📥 Export Gradebook Excel ] |
++-------------------------------------------------------------------------------+
+```
+
+---
+
+### 7.7. Screen 7: Lecturer Leave Application Review & Adjudication Panel
+* **Functional Logic:**
+  * Allows the instructor to inspect the student's reason and attached proof image.
+  * Clicking `[ Approve ]` marks status as **Excused** and awards **2/10 points**.
+  * Clicking `[ Reject ]` marks status as **Unexcused** and keeps **0/10 points**.
+
+```
++-------------------------------------------------------------------------------+
+| LEAVE APPLICATION REVIEW - SOFTWARE ENGINEERING (CS301-G01)                   |
++-------------------------------------------------------------------------------+
+| Ticket #108: Student David Lee (ID: B22DCCN120)                               |
+| Session Date: Session 1 - Tuesday (Nov 01, 2026)                              |
+| Claimed Reason: Acute dengue fever; admitted to University Medical Center.     |
+| Attached Document: [Click to view full preview: hospital_admission_slip.jpg]   |
+|                                                                               |
+|  +-----------------------------------+-------------------------------------+  |
+|  |  [✓] APPROVE AS EXCUSED           |  [X] REJECT APPLICATION             |  |
+|  |  (Recorded as EXCUSED -> 2/10 PTS)|  (Recorded as UNEXCUSED -> 0/10 PTS)|  |
+|  +-----------------------------------+-------------------------------------+  |
+|  Instructor Feedback: [Approved. Wishing you a speedy recovery, David.]       |
++-------------------------------------------------------------------------------+
+```
+
+---
+
+### 7.8. Screen 8: System Administrator (Admin) Master Control Dashboard
+* **Functional Logic:**
+  * Accessible by entering Admin credentials in either login tab.
+  * Centralizes Master Classroom Geofence setup, hardware unbinding (Device ID reset), user role management, and security audit logs.
+
+```
++-------------------------------------------------------------------------------+
+| [ADMIN MASTER PORTAL] INSTITUTIONAL SMART GPS ATTENDANCE SYSTEM               |
++-------------------------------------------------------------------------------+
+| 1. Master Classroom Directory & Geofence Coordinates:                         |
+|    - Room B204 (Bldg B): Lat = 10.823098, Long = 106.629663, Radius = 35m     |
+|    - Room A301 (Bldg A): Lat = 10.824150, Long = 106.630120, Radius = 40m     |
+|    [ + Add New Classroom ]  [ ✏️ Calibrate GPS Anchor Coordinates ]            |
+|                                                                               |
+| 2. Device Hardware Binding Management (Reset Device ID):                      |
+|    - Student: B22DCCN001 | Bound Device: DEV-IP15-9921 | [ 🔄 Reset Lock ]    |
+|    - Student: B22DCCN015 | Bound Device: DEV-SS24-1102 | [ 🔄 Reset Lock ]    |
+|                                                                               |
+| 3. Security Audit Logs & Anti-Fraud Infractions:                              |
+|    - 06:55 AM: Student B22DCCN088 flagged for Mock Location (Fake GPS) -> Banned|
+|    - 07:01 AM: Device DEV-IP15-9921 attempted 2nd check-in for B22DCCN099 ->   |
+|                Blocked by Anti-Proxy 1-Device Rule!                           |
++-------------------------------------------------------------------------------+
+```
+
+---
