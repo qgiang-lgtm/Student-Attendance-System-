@@ -1,5 +1,7 @@
 ## V. USE CASE DIAGRAM & DETAILED SPECIFICATIONS
-
+### 1. Comprehensive Use Case Diagram
+ ![img.png](img.png)
+---
 ### 2. Detailed Use Case Specifications
 
 #### 2.1. Use Case UC01: Universal Authentication & Smart Admin Auto-Routing
