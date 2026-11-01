@@ -1,0 +1,104 @@
+Index: Non-function_requirement.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Non-Functional Requirements\r\n\r\n**Product Requirements**:\r\n\r\n\\-Performance:\r\n\r\nThe system must respond promptly, supporting a minimum of 10,000 concurrent users during peak periods such as class attendance check-ins at the start of a session.\r\n\r\nThe average response time for a user request must not exceed 5 seconds.\r\n\r\n\\-Reliability:\r\n\r\nThe system operates continuously with 99.9% availability, 24/7, to support attendance tracking and learning management.\r\n\r\nAn automated daily database backup mechanism is in place to prevent data loss.\r\n\r\n\\-Security:\r\n\r\nThe user's password must be at least 8 characters long and include both lowercase and uppercase letters.\r\n\r\nThe system must include security features to prevent common security vulnerabilities such as SQL Injection and XSS.\r\n\r\n\\-Usability:\r\n\r\nThe interface is designed to be user-friendly for students, instructors, and administrators, minimizing the risk of operational errors.\r\n\r\ndesign an interface that is compatible with web browsers on both desktop and mobile.\r\n\r\n**Organizational Requirements**:\r\n\r\n\\-Application Platform**:** Web-based application accessible through modern web browsers.\r\n\r\n\\- Frontend Technologies: HTML5, CSS3, JavaScript.\r\n\r\n\\- Backend Programming Language: Java or Python.\r\n\r\n\\- Database Management System: MySQL.\r\n\r\n**External Requirements**:\r\n\r\n\\- Legislative Requirements:\r\n\r\nThe system must comply with university regulations regarding student data privacy and academic records protection.\r\n\r\nSoftware Architecture\r\n\r\nTo ensure high maintainability, scalability, and separation of concerns, the Student Attendance Management System adopts a standard 3-Tier Layered Architecture. This architectural pattern separates applications into three logical tiers, allowing developers to modify or add specific layers independently without affecting the entire system.\r\n\r\n**Presentation Layer (Client Tier)**:\r\n\r\n\\- Role**:** Acts as the user interface and the entry point of the application. It handles user interactions and renders data visually.\r\n\r\n\\- Implementation: Built using a Responsive Web Design approach (HTML5, CSS3, JavaScript) accessible via modern web browsers on both desktops and mobile devices for Students, Lecturers, and Administrators.\r\n\r\n**Business Logic Layer** (Application Tier):\r\n\r\n\\- Role: Acts as the \"brain\" of the system, handling core business logic, verifying attendance timestamps, authenticating PIN codes, and managing user permissions (RBAC).\r\n\r\n\\- Implementation: Written in Python or Java, it receives requests from the front-end interface before interacting with the database.\r\n\r\n**Data Access Layer** (Database Tier):\r\n\r\n\\- Role: Manages long-term data storage and retrieval and executes query commands against the database.\r\n\r\n\\- Implementation: Use MySQL to store entity tables such as Users, Courses, Course Sections, Attendance Sessions, and Attendance Details.
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Non-function_requirement.md b/Non-function_requirement.md
+--- a/Non-function_requirement.md	(revision 6516ac5853eae11b029ac54fb672382dfc7dae45)
++++ b/Non-function_requirement.md	(date 1793519255352)
+@@ -1,65 +1,32 @@
+-Non-Functional Requirements
+-
+-**Product Requirements**:
+-
+-\-Performance:
+-
+-The system must respond promptly, supporting a minimum of 10,000 concurrent users during peak periods such as class attendance check-ins at the start of a session.
+-
+-The average response time for a user request must not exceed 5 seconds.
+-
+-\-Reliability:
+-
+-The system operates continuously with 99.9% availability, 24/7, to support attendance tracking and learning management.
+-
+-An automated daily database backup mechanism is in place to prevent data loss.
+-
+-\-Security:
+-
+-The user's password must be at least 8 characters long and include both lowercase and uppercase letters.
+-
+-The system must include security features to prevent common security vulnerabilities such as SQL Injection and XSS.
+-
+-\-Usability:
+-
+-The interface is designed to be user-friendly for students, instructors, and administrators, minimizing the risk of operational errors.
+-
+-design an interface that is compatible with web browsers on both desktop and mobile.
+-
+-**Organizational Requirements**:
+-
+-\-Application Platform**:** Web-based application accessible through modern web browsers.
+-
+-\- Frontend Technologies: HTML5, CSS3, JavaScript.
++## III. NON-FUNCTIONAL REQUIREMENTS (NATURAL LANGUAGE SPECIFICATION)
+ 
+-\- Backend Programming Language: Java or Python.
++### 1. Usability
++* **Responsive Web Design:** Fully responsive mobile-first architecture optimized for smartphone browsers (Mobile Safari on iOS, Google Chrome on Android), tablets, and desktop workstations. Supports accessible contrast ratios, Light Mode, and Dark Mode consistent with modern institutional portals.
++* **1-Tap Check-in Experience:** Streamlined user journey requiring zero unnecessary navigation; opening the homepage immediately surfaces the active countdown banner and a single action button to complete check-in within 3 seconds.
++* **Visual Status Feedback:** Clear color-coded alerts (Green = Success 10/10; Yellow = Late 5/10; Red = Geofence rejection or absence 0/10; Purple = Pending leave review).
+ 
+-\- Database Management System: MySQL.
++### 2. Reliability & Accuracy
++* **Haversine Spherical Distance Calculation:**
++  Distance $d$ between the student's reported coordinates $(lat_1, lon_1)$ and the classroom anchor $(lat_2, lon_2)$ is mathematically computed server-side:
++  $$d = 2 \cdot R_{earth} \cdot \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta \varphi}{2}\right) + \cos(\varphi_1)\cdot\cos(\varphi_2)\cdot\sin^2\left(\frac{\Delta \lambda}{2}\right)}\right)$$
++  *(Where: $R_{earth} = 6,371,000\text{ m}$; $\Delta \varphi = \varphi_2 - \varphi_1$; $\Delta \lambda = \lambda_2 - \lambda_1$ in radians).*
++* **Authoritative Server Time Synchronization:** All check-in windows, late cutoffs, and timestamps are validated exclusively against server-side Network Time Protocol (NTP) clocks, rendering client device clock tampering impossible.
++* **System Availability:** Guarantees $\ge 99.8\%$ uptime during peak morning and afternoon class changeover periods.
+ 
+-**External Requirements**:
++### 3. Performance
++* **High Concurrency Throughput:** The backend architecture must reliably absorb and process simultaneous check-in spikes of $\ge 5,000$ to $10,000$ concurrent student requests during the 15-minute start window without degraded response times or service interruptions.
++* **Response Latency:** Server turnaround time from GPS coordinate transmission to visual confirmation must not exceed $1.5$ seconds under standard 4G/5G/Campus Wi-Fi connectivity.
+ 
+-\- Legislative Requirements:
++### 4. Security & Anti-Spoofing
++* **Anti-Mock Geolocation Detection:** Rigorous validation checking for browser mock location flags, impossible transit velocities between consecutive check-ins (speed anomaly detection), and verification against campus subnet IP pools.
++* **Anti-Proxy Device Fingerprinting:** Unique browser hardware signatures bound to active user tokens, blocking multi-account check-ins originating from the same physical handset.
++* **Data Transport Encryption:** Mandatory HTTPS transport with TLS 1.3 protocol. User passwords securely hashed using one-way salted algorithms (`bcrypt` or `Argon2`).
++* **Role-Based Access Control (RBAC):** Cryptographically signed JSON Web Tokens (JWT) enforcing route protection across Student, Lecturer, and Admin tiers.
+ 
+-The system must comply with university regulations regarding student data privacy and academic records protection.
+-
+-Software Architecture
+-
+-To ensure high maintainability, scalability, and separation of concerns, the Student Attendance Management System adopts a standard 3-Tier Layered Architecture. This architectural pattern separates applications into three logical tiers, allowing developers to modify or add specific layers independently without affecting the entire system.
+-
+-**Presentation Layer (Client Tier)**:
+-
+-\- Role**:** Acts as the user interface and the entry point of the application. It handles user interactions and renders data visually.
+-
+-\- Implementation: Built using a Responsive Web Design approach (HTML5, CSS3, JavaScript) accessible via modern web browsers on both desktops and mobile devices for Students, Lecturers, and Administrators.
+-
+-**Business Logic Layer** (Application Tier):
+-
+-\- Role: Acts as the "brain" of the system, handling core business logic, verifying attendance timestamps, authenticating PIN codes, and managing user permissions (RBAC).
+-
+-\- Implementation: Written in Python or Java, it receives requests from the front-end interface before interacting with the database.
+-
+-**Data Access Layer** (Database Tier):
+-
+-\- Role: Manages long-term data storage and retrieval and executes query commands against the database.
++### 5. Design & Technology Constraints
++* **Architecture:** Decoupled Client-Server RESTful API architecture following clean, multi-tier software engineering standards.
++* **Frontend:** Modern Web Stack (HTML5, Tailwind CSS, TypeScript / React / Vue, Leaflet.js for interactive geofence radar visualization).
++* **Backend:** Node.js (NestJS / Express) or Python (FastAPI) optimized for asynchronous non-blocking spatial queries.
++* **Database:** Relational Database Management System (PostgreSQL with PostGIS spatial extensions, or MySQL 8.0 with Spatial Indexes).
+ 
+-\- Implementation: Use MySQL to store entity tables such as Users, Courses, Course Sections, Attendance Sessions, and Attendance Details.
+\ No newline at end of file
++---
+\ No newline at end of file
