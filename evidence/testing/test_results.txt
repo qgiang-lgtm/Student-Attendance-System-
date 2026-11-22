@@ -1,0 +1,52 @@
+===========================================================
+  GPS ATTENDANCE SYSTEM - AUTOMATED UNIT TEST SUITE (C++)   
+===========================================================
+
+>>> [SUITE 1] Haversine Spherical Distance Calculation (NFR-04)
+  [PASS] Distance to self is 0 meters
+  [PASS] Nearby coordinate distance calculated accurately (~7m - 12m)
+  [PASS] Far coordinate distance exceeds 200 meters
+
+>>> [SUITE 2] Geofence Boundary Evaluation (NFR-04, FR-05)
+  [PASS] Coordinate inside 35m radius is detected as INSIDE
+  [PASS] Coordinate outside 35m radius is detected as OUTSIDE
+
+>>> [SUITE 3] Attendance Business Rules Grading Engine (Section II.2)
+  [PASS] Early check-in at 06:45 is Present (10/10)
+  [PASS] On-time check-in at 06:58 is Present (10/10)
+  [PASS] Boundary check-in at 07:15 is Present (10/10)
+  [PASS] Late check-in at 07:18 is Late (5/10)
+  [PASS] Boundary check-in at 07:45 is Late (5/10)
+  [PASS] Cutoff expired at 07:46 is Absent (0/10)
+  [PASS] Check-in outside perimeter is Rejected (0/10)
+  [PASS] Approved leave awards Excused (2/10)
+  [PASS] Rejected leave awards Unexcused (0/10)
+
+>>> [SUITE 4] Anti-Fraud & Anti-Proxy Device Binding (NFR-09, NFR-10, FR-03)
+  [PASS] GPS accuracy of 15m is ACCEPTED (<= 20m)
+  [PASS] GPS accuracy of 35m is REJECTED (> 20m)
+  [PASS] Mock Location flag detected and BLOCKED
+  [PASS] Proxy check-in with same handset for different student is BLOCKED
+
+>>> [SUITE 5] Universal Authentication & Admin Auto-Routing (FR-01, FR-02)
+  [PASS] Admin logging in through Student tab auto-routed to Admin Dashboard
+  [PASS] Admin logging in through Lecturer tab auto-routed to Admin Dashboard
+  [PASS] Student logging in routed to Student Dashboard
+  [PASS] Lecturer logging in routed to Lecturer Dashboard
+
+>>> [SUITE 6] Repository & Use Case Integration (UC01 - UC21)
+  [PASS] Student B22DCCN001 check-in processed: Present 10/10
+  [PASS] Leave request submitted with PENDING status
+  [PASS] Lecturer adjudicated leave request: Excused 2/10 pts awarded
+  [PASS] Admin successfully reset hardware device binding lock
+
+>>> [SUITE 7] Check-in Zone (Geofence) Control (UC22 - UC24)
+  [PASS] Lecturer moves the check-in circle: new centre + radius are persisted
+  [PASS] Check-in outside the selected circle is REJECTED (0/10)
+  [PASS] Check-in inside the selected circle is PRESENT (10/10)
+  [PASS] Student is forbidden from changing the check-in zone (HTTP 403)
+  [PASS] Lecturer can change the check-in zone (HTTP 200)
+
+===========================================================
+ TEST RESULTS SUMMARY: 31 / 31 PASSED (100%)
+===========================================================
