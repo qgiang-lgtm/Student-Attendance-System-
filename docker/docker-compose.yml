@@ -1,0 +1,43 @@
+name: progandtest_group01
+
+services:
+  attendance-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: gps_attendance_app
+    restart: unless-stopped
+    volumes:
+      # Accounts / audit logs must survive container recreation (not just restart).
+      - attendance-data:/app/data
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - TZ=Asia/Ho_Chi_Minh
+      # Default empty = the app shows a generic hint instead of a hardcoded IP.
+      # Run scripts/phone-url.ps1 -Update to fill in this machine's real LAN IP.
+      - LAN_HINT=${LAN_HINT:-}
+      # Check-in is only accepted from these networks (the classroom LAN).
+      # 172.16.0.0/12 = Docker's own bridge, 127.0.0.0/8 = local demo.
+      - CLASSROOM_CIDR=${CLASSROOM_CIDR:-192.168.1.0/24,172.16.0.0/12,127.0.0.0/8}
+      # Optional: pin the classroom public IP instead of learning it at runtime.
+      - CLASSROOM_PUBLIC_IP=${CLASSROOM_PUBLIC_IP:-}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  attendance-tests:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: gps_attendance_tests
+    command: ["/app/tests"]
+    profiles:
+      - test
+
+volumes:
+  attendance-data:
